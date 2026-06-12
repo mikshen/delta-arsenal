@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>三角洲改枪库</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="导航">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">D</div>
+          <div>
+            <p class="eyebrow">Delta Arsenal</p>
+            <h1>三角洲改枪库</h1>
+          </div>
+        </div>
+
+        <nav class="nav-list" aria-label="主导航">
+          <button class="nav-item is-active" data-filter-collection="all">
+            <span class="nav-icon">⌂</span>
+            <span>全部配置</span>
+          </button>
+          <button class="nav-item" data-filter-collection="favorite">
+            <span class="nav-icon">★</span>
+            <span>常用收藏</span>
+          </button>
+          <button class="nav-item" data-filter-collection="shared">
+            <span class="nav-icon">↗</span>
+            <span>可分享</span>
+          </button>
+        </nav>
+
+        <div class="side-stat">
+          <span>已保存</span>
+          <strong id="savedCount">0</strong>
+        </div>
+        <div class="side-stat">
+          <span>枪械数量</span>
+          <strong id="weaponCount">0</strong>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">私人库存 / 展示分享 / 复制改枪码</p>
+            <h2>把顺手的配置都留下来</h2>
+          </div>
+          <div class="topbar-actions">
+            <button class="icon-button" id="exportBtn" title="导出数据" aria-label="导出数据">⇩</button>
+            <label class="icon-button file-button" title="导入数据" aria-label="导入数据">
+              ⇧
+              <input id="importFile" type="file" accept="application/json" />
+            </label>
+            <button class="primary-button" id="newBuildBtn">新增配置</button>
+          </div>
+        </header>
+
+        <section class="control-strip" aria-label="筛选">
+          <label class="search-box">
+            <span>搜索</span>
+            <input id="searchInput" type="search" placeholder="枪名、标签、改枪码" autocomplete="off" />
+          </label>
+
+          <div class="segmented" role="group" aria-label="枪械类型">
+            <button class="segment is-active" data-type="all">全部枪械</button>
+            <button class="segment" data-type="步枪">步枪</button>
+            <button class="segment" data-type="冲锋枪">冲锋枪</button>
+            <button class="segment" data-type="霰弹枪">霰弹枪</button>
+            <button class="segment" data-type="轻机枪">轻机枪</button>
+            <button class="segment" data-type="精确射手步枪">精确射手步枪</button>
+            <button class="segment" data-type="狙击步枪">狙击步枪</button>
+            <button class="segment" data-type="特殊武器">特殊武器</button>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <section class="library-panel" aria-label="配置列表">
+            <div class="panel-head">
+              <div>
+                <p class="eyebrow">Build Library</p>
+                <h3>配置列表</h3>
+              </div>
+              <span id="resultCount" class="result-count">0 条</span>
+            </div>
+            <div class="build-list" id="buildList"></div>
+          </section>
+
+          <section class="detail-panel" aria-label="配置详情">
+            <div class="weapon-stage">
+              <div class="stage-grid" aria-hidden="true"></div>
+              <div class="weapon-model" aria-hidden="true">
+                <span class="barrel"></span>
+                <span class="body"></span>
+                <span class="mag"></span>
+                <span class="stock"></span>
+                <span class="scope"></span>
+              </div>
+            </div>
+
+            <div id="detailEmpty" class="empty-state">
+              <p class="eyebrow">Select Build</p>
+              <h3>选择一条配置查看详情</h3>
+              <p>左侧可以筛选、复制，也可以把自己的改枪码录入进来。</p>
+            </div>
+
+            <article id="detailCard" class="detail-card is-hidden">
+              <div class="detail-title">
+                <div>
+                  <p class="eyebrow" id="detailCategory"></p>
+                  <h3 id="detailName"></h3>
+                </div>
+                <button class="icon-button" id="favoriteBtn" title="收藏" aria-label="收藏">☆</button>
+              </div>
+
+              <div class="code-box">
+                <span id="detailCode"></span>
+                <button id="copyDetailBtn">复制</button>
+              </div>
+
+              <p class="detail-note" id="detailNote"></p>
+
+              <div class="meta-grid">
+                <div>
+                  <span>手感评分</span>
+                  <strong id="detailRating"></strong>
+                </div>
+                <div>
+                  <span>适用玩法</span>
+                  <strong id="detailMode"></strong>
+                </div>
+                <div>
+                  <span>可见性</span>
+                  <strong id="detailVisibility"></strong>
+                </div>
+              </div>
+
+              <div class="parts-list" id="detailParts"></div>
+              <div class="attachment-list" id="detailAttachments"></div>
+              <div class="stat-list" id="detailStats"></div>
+
+              <div class="detail-actions">
+                <button id="copyShareBtn">复制分享文本</button>
+                <button id="editBtn">编辑</button>
+                <button class="danger-button" id="deleteBtn">删除</button>
+              </div>
+            </article>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="buildDialog" class="build-dialog">
+      <form id="buildForm" method="dialog">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">Build Editor</p>
+            <h3 id="dialogTitle">新增配置</h3>
+          </div>
+          <button class="icon-button" id="closeDialogBtn" type="button" aria-label="关闭">×</button>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            枪械名称
+            <input name="weapon" required placeholder="例如：M4A1" />
+          </label>
+          <label>
+            类型
+            <select name="category">
+              <option>步枪</option>
+              <option>冲锋枪</option>
+              <option>霰弹枪</option>
+              <option>轻机枪</option>
+              <option>精确射手步枪</option>
+              <option>狙击步枪</option>
+              <option>特殊武器</option>
+            </select>
+          </label>
+          <label>
+            配置名称
+            <input name="title" required placeholder="例如：低后座中距离" />
+          </label>
+          <label>
+            玩法
+            <input name="mode" placeholder="全面战场 / 烽火地带" />
+          </label>
+          <label class="full">
+            改枪码
+            <input name="code" required placeholder="粘贴游戏内改枪码" />
+          </label>
+          <label class="full">
+            配件摘要
+            <input name="parts" placeholder="枪口, 握把, 枪托, 瞄具，用逗号分隔" />
+          </label>
+          <label class="full">
+            使用备注
+            <textarea name="note" rows="4" placeholder="压枪手感、适合距离、缺点、替代配件"></textarea>
+          </label>
+          <label>
+            评分
+            <input name="rating" type="number" min="1" max="10" value="8" />
+          </label>
+          <label class="toggle-line">
+            <input name="shared" type="checkbox" checked />
+            可分享展示
+          </label>
+        </div>
+
+        <div class="dialog-actions">
+          <button type="button" id="cancelBtn">取消</button>
+          <button class="primary-button" type="submit">保存配置</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
